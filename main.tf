@@ -39,7 +39,7 @@ resource "docker_container" "mongo" {
     }
     # Montowanie woluminu MongoDB
     mounts {
-        target = "data/db"
+        target = "/data/db"
         source = docker_volume.mongo_data.name
         type = "volume"
     }

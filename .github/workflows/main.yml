@@ -42,31 +42,66 @@ jobs:
     name: Deploy to VPS
     runs-on: ubuntu-latest
     needs: build
-    
+
+    # Deploy with Terraform
+    # steps:
+    #   - name: Checkout 
+    #     uses: actions/checkout@v3
+    #   - name: Install Terraform
+    #     uses: hashicorp/setup-terraform@v2
+    #     with:
+    #       terraform_version: 1.5.6
+        
+    #   - name: Inicjalizacja
+    #     run: terraform init
+
+    #   - name: Plan
+    #     run: terraform plan
+
+    #   - name: Zatwierdzanie planu i konfiguracji
+    #     run: terraform apply -auto-approve
     steps:
-      - name: Checkout 
-        uses: actions/checkout@v3
+       - name: Checkout 
+         uses: actions/checkout@v3
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.9
-        with: 
-          host: ${{secrets.VPS_HOST}}
-          username: ${{secrets.VPS_USER}}
-          key: ${{secrets.VPS_SSH_KEY}}
-          port: 22
-          script: |
-            docker stop app || true
-            docker rm app || true
-            docker pull ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
+       - name: Deploy to VPS
+         uses: appleboy/ssh-action@v0.1.9
+         with: 
+           host: ${{secrets.VPS_HOST}}
+           username: ${{secrets.VPS_USER}}
+           key: ${{secrets.VPS_SSH_KEY}}
+           port: 22
+           script: |
+             cd ~/terraform
+             terraform init
+             terraform apply -auto-aprove
+
+
+    # Deploy with Docker
+    # steps:
+    #   - name: Checkout 
+    #     uses: actions/checkout@v3
+
+    #   - name: Deploy to VPS
+    #     uses: appleboy/ssh-action@v0.1.9
+    #     with: 
+    #       host: ${{secrets.VPS_HOST}}
+    #       username: ${{secrets.VPS_USER}}
+    #       key: ${{secrets.VPS_SSH_KEY}}
+    #       port: 22
+    #       script: |
+    #         docker stop app || true
+    #         docker rm app || true
+    #         docker pull ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
              
-            # Uruchomienie kontenera MongoDB (jeśli nie działa)
-            docker inspect mongo >/dev/null 2>&1 || \
-            docker run -d --name mongo \
-              -p 27017:27017 \
-              mongo:5.0
+    #         # Uruchomienie kontenera MongoDB (jeśli nie działa)
+    #         docker inspect mongo >/dev/null 2>&1 || \
+    #         docker run -d --name mongo \
+    #           -p 27017:27017 \
+    #           mongo:5.0
 
-            # Uruchomienie nowego kontenera aplikacji
-            docker run -d --name app \
-              -p 3000:3000 \
-              --link mongo \
-              ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
+    #         # Uruchomienie nowego kontenera aplikacji
+    #         docker run -d --name app \
+    #           -p 3000:3000 \
+    #           --link mongo \
+    #           ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
