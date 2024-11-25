@@ -68,9 +68,5 @@ resource "docker_container" "app" {
     # Kontener aplikacji nie uruchomi się przed Mongo
     depends_on = [docker_container.mongo] 
 }
-variable "docker_image" {
-    description = "Obraz Dockera aplikacji Node.js"
-    type = string
-}
 
 
