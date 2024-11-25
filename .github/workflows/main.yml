@@ -64,7 +64,16 @@ jobs:
        - name: Checkout 
          uses: actions/checkout@v3
 
-       - name: Deploy to VPS
+       - name: Upload Terraform files to VPS
+         uses: appleboy/scp-action@v0.1.6
+         with:
+           host: ${{secrets.VPS_HOST}}
+           username: ${{secrets.VPS_USER}}
+           key: ${{secrets.VPS_SSH_KEY}} 
+           source: "./*.tf" #pliki do ściągnięcia
+           target: "~/terraform" #ścieżka do uploadu
+           
+       - name: Run Terraform on VPS
          uses: appleboy/ssh-action@v0.1.9
          with: 
            host: ${{secrets.VPS_HOST}}
@@ -74,7 +83,7 @@ jobs:
            script: |
              cd ~/terraform
              terraform init
-             terraform apply -auto-approve
+             terraform apply -auto-approve -var="docker_image=${{secrets.DOCKER_USERNAME}}/node-mongo-app:latest"
 
 
     # Deploy with Docker
