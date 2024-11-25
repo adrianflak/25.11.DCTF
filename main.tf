@@ -55,7 +55,8 @@ resource "docker_image" "app_image" {
 # Tworzenie kontenera dla aplikacji Nodejs
 resource "docker_container" "app" {
     name = "app" # Nazwa kontenera
-    image = docker_image.app_image.name # Wykorzystanie obrazu z DockerHub
+    # image = docker_image.app_image.name # Wykorzystanie obrazu z DockerHub
+    image = "${var.docker_image}"
 
     ports {
         internal = 3000 # port w kontenerze
@@ -67,8 +68,9 @@ resource "docker_container" "app" {
     # Kontener aplikacji nie uruchomi się przed Mongo
     depends_on = [docker_container.mongo] 
 }
-output "app_url" {
-  value       = "http://localhost:3000"
-  description = "URL aplikacji"
+variable "docker_image" {
+    description = "Obraz Dockera aplikacji Node.js"
+    type = "string"
 }
+
 
