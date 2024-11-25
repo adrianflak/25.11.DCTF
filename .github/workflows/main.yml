@@ -58,13 +58,15 @@ jobs:
             docker stop app || true
             docker rm app || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
-            # Uruchomienie nowego kontenera aplikacji
-            docker run -d --name app \
-              -p 3000:3000 \
-              --link mongo \
-              ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
+             
             # Uruchomienie kontenera MongoDB (jeśli nie działa)
             docker inspect mongo >/dev/null 2>&1 || \
             docker run -d --name mongo \
               -p 27017:27017 \
               mongo:5.0
+
+            # Uruchomienie nowego kontenera aplikacji
+            docker run -d --name app \
+              -p 3000:3000 \
+              --link mongo \
+              ${{ secrets.DOCKER_USERNAME }}/node-mongo-app:latest
