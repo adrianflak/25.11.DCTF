@@ -1,5 +1,5 @@
 terraform {
-  # Definicja wymaganego dostawcy (provider) Docker
+  # Definicja wymaganego dostawcy (provider) Docker!
   required_providers {
     docker = {
       source  = "kreuzwerker/docker" # Źródło dostawcy Terraform dla Dockera
