@@ -11,8 +11,15 @@ terraform {
 provider "docker" {}
 
 # Sieć do komunikacji pomiędzy kontenerami
+data "docker_network" "existing_network" {
+  name = "app_network"
+}
+# Sieć tworzona wtedy kiedy istnieje
 resource "docker_network" "app_network" {
-    name = "app_network"
+  name = "app_network"
+
+  # Tworzenie sieci tylko wtedy, gdy jej brak
+  count = length(data.docker_network.existing_network.id) == 0 ? 1 : 0
 }
 # Wolumin dla MongoDB
 resource "docker_volume" "mongo_data" {
@@ -35,7 +42,8 @@ resource "docker_container" "mongo" {
     }
     # Podłączenie do sieci 
     networks_advanced {
-        name = docker_network.app_network.name
+        #name = docker_network.app_network.name
+        name = "app_network"
     }
     # Montowanie woluminu MongoDB
     mounts {
@@ -63,7 +71,8 @@ resource "docker_container" "app" {
         external = 3000 # port w hoście
     }
     networks_advanced {
-        name = docker_network.app_network.name
+        name = "app_network"
+        #name = docker_network.app_network.name
     }
     env = [
         "MONGO_URL=mongodb://mongo:27017/myapp"
