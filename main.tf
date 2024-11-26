@@ -30,9 +30,13 @@ resource "docker_volume" "mongo_data" {
 resource "docker_image" "mongo" {
     name = "mongo:5.0"
 }
-
-# Tworzenie kontenera dla MongoDB 
+# Sprawdzenie czy istnieje kontener Mongo
+data "docker_container" "existing_mongo" {
+  name = "mongo"
+}
+# Tworzenie kontenera dla MongoDB, jeśli nie istnieje
 resource "docker_container" "mongo" {
+    count = length(data.docker_container.existing_mongo.id) == 0 ? 1 : 0
     name = "mongo"
     image = docker_image.mongo.name
 
