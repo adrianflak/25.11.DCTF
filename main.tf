@@ -55,18 +55,21 @@ resource "docker_image" "app_image" {
 # Tworzenie kontenera dla aplikacji Nodejs
 resource "docker_container" "app" {
     name = "app" # Nazwa kontenera
-    # image = docker_image.app_image.name # Wykorzystanie obrazu z DockerHub
-    image = "${var.docker_image}"
+    image = docker_image.app_image.name # Wykorzystanie obrazu z DockerHub
+    #image = "${var.docker_image}"
 
     ports {
         internal = 3000 # port w kontenerze
-        external = 3000 # port w hoście 
+        external = 3000 # port w hoście
     }
     networks_advanced {
         name = docker_network.app_network.name
     }
+    env = [
+        "MONGO_URL=mongodb://mongo:27017/myapp"
+    ]
     # Kontener aplikacji nie uruchomi się przed Mongo
-    depends_on = [docker_container.mongo] 
+    depends_on = [docker_container.mongo]
 }
 
 
