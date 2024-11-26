@@ -31,12 +31,12 @@ resource "docker_image" "mongo" {
     name = "mongo:5.0"
 }
 # Sprawdzenie czy istnieje kontener Mongo
-data "docker_container" "existing_mongo" {
-  name = "mongo"
+data "external" "existing_mongo" {
+  program = ["bash", "-c", "docker ps -a --filter 'name=mongo' --format '{{.Names}}' | grep -w mongo || echo ''"]
 }
 # Tworzenie kontenera dla MongoDB, jeśli nie istnieje
 resource "docker_container" "mongo" {
-    count = length(data.docker_container.existing_mongo.id) == 0 ? 1 : 0
+    count = data.external.existing_mongo.result == "" ? 1 : 0
     name = "mongo"
     image = docker_image.mongo.name
 
